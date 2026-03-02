@@ -7,7 +7,7 @@
 
 <style>
 body {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     background: #f0f0f0;
     text-align: center;
     margin: 0;
@@ -23,15 +23,19 @@ body {
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
-button {
+select, button {
     width: 100%;
     padding: 10px;
     margin-top: 10px;
     font-size: 16px;
+}
+
+button {
     background: #27ae60;
     color: white;
     border: none;
     border-radius: 5px;
+    cursor: pointer;
 }
 
 button:hover {
@@ -44,6 +48,7 @@ button:hover {
     margin-top: 10px;
     border-radius: 6px;
 }
+
 .done {
     background: #d4edda;
 }
@@ -57,6 +62,7 @@ button:hover {
 
 <p>اختر هدفك:</p>
 <select id="goal">
+<option value="">اختر</option>
 <option value="weight">تخسيس</option>
 <option value="muscle">بناء عضلات</option>
 <option value="fitness">لياقة عامة</option>
@@ -75,6 +81,11 @@ let tasksList = [];
 
 function generateTasks(){
 let goal = document.getElementById("goal").value;
+
+if(!goal){
+alert("اختر هدفك أولاً");
+return;
+}
 
 if(goal === "weight"){
 tasksList = ["جري 10 دقائق","سكوات 20 عدة","تمارين بطن 15 عدة"];
@@ -97,6 +108,8 @@ container.innerHTML = "";
 tasksList.forEach((task, index) => {
 let div = document.createElement("div");
 div.className = "task";
+if(task.startsWith("✔")) div.classList.add("done");
+
 div.innerHTML = task + "<br><button onclick='completeTask("+index+")'>تم التنفيذ</button>";
 container.appendChild(div);
 });
@@ -105,13 +118,15 @@ updateProgress();
 }
 
 function completeTask(index){
+if(!tasksList[index].startsWith("✔")){
 tasksList[index] = "✔ " + tasksList[index];
+}
 renderTasks();
 saveData();
 }
 
 function updateProgress(){
-let done = tasksList.filter(t => t.includes("✔")).length;
+let done = tasksList.filter(t => t.startsWith("✔")).length;
 document.getElementById("progress").innerText = done + " / " + tasksList.length;
 }
 
