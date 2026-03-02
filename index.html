@@ -2,58 +2,132 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>برنامج البحث والرياضة</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مدربك اليومي</title>
 
 <style>
-body{
-  font-family: Arial;
-  text-align: center;
-  background: #f0f0f0;
+body {
+    font-family: Arial;
+    background: #f0f0f0;
+    text-align: center;
+    margin: 0;
 }
 
-.box{
-  background: white;
-  padding: 20px;
-  margin: 40px auto;
-  width: 300px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+.container {
+    background: white;
+    width: 90%;
+    max-width: 420px;
+    margin: 30px auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
-button{
-  padding: 10px;
-  margin: 5px;
-  width: 80%;
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 16px;
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #219150;
+}
+
+.task {
+    background: #ecf0f1;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 6px;
+}
+.done {
+    background: #d4edda;
 }
 </style>
-
 </head>
 
 <body>
 
-<div class="box">
-<h2>🔎 البحث</h2>
-<input id="searchText" placeholder="اكتب كلمة البحث">
-<br><br>
-<button onclick="search()">بحث</button>
-</div>
+<div class="container">
+<h2>🏋️ مدربك اليومي</h2>
 
-<div class="box">
-<h2>🏃 الرياضة</h2>
-<button onclick="showSport('كرة القدم')">كرة القدم</button>
-<button onclick="showSport('السباحة')">السباحة</button>
-<button onclick="showSport('الجري')">الجري</button>
-<p id="result"></p>
+<p>اختر هدفك:</p>
+<select id="goal">
+<option value="weight">تخسيس</option>
+<option value="muscle">بناء عضلات</option>
+<option value="fitness">لياقة عامة</option>
+</select>
+
+<button onclick="generateTasks()">إنشاء مهام اليوم</button>
+
+<div id="tasks"></div>
+
+<h3>✅ إنجاز اليوم</h3>
+<p id="progress">0 / 0</p>
 </div>
 
 <script>
-function search(){
-  let text = document.getElementById("searchText").value;
-  window.open("https://www.google.com/search?q=" + text);
+let tasksList = [];
+
+function generateTasks(){
+let goal = document.getElementById("goal").value;
+
+if(goal === "weight"){
+tasksList = ["جري 10 دقائق","سكوات 20 عدة","تمارين بطن 15 عدة"];
+}
+else if(goal === "muscle"){
+tasksList = ["تمرين ضغط 15 عدة","تمرين صدر","تمرين ذراع"];
+}
+else{
+tasksList = ["قفز حبل 5 دقائق","بلانك 30 ثانية","تمارين توازن"];
 }
 
-function showSport(name){
-  document.getElementById("result").innerText = "اخترت: " + name;
+renderTasks();
+saveData();
 }
+
+function renderTasks(){
+let container = document.getElementById("tasks");
+container.innerHTML = "";
+
+tasksList.forEach((task, index) => {
+let div = document.createElement("div");
+div.className = "task";
+div.innerHTML = task + "<br><button onclick='completeTask("+index+")'>تم التنفيذ</button>";
+container.appendChild(div);
+});
+
+updateProgress();
+}
+
+function completeTask(index){
+tasksList[index] = "✔ " + tasksList[index];
+renderTasks();
+saveData();
+}
+
+function updateProgress(){
+let done = tasksList.filter(t => t.includes("✔")).length;
+document.getElementById("progress").innerText = done + " / " + tasksList.length;
+}
+
+function saveData(){
+localStorage.setItem("tasks", JSON.stringify(tasksList));
+}
+
+function loadData(){
+let data = localStorage.getItem("tasks");
+if(data){
+tasksList = JSON.parse(data);
+renderTasks();
+}
+}
+
+loadData();
 </script>
 
 </body>
